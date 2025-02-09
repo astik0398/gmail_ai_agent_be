@@ -16,6 +16,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemailer": "^6.9.16",
-    "openai": "^4.79.1"
+    "openai": "^4.79.1",
+    "twilio": "^5.4.3"
   }
 }
