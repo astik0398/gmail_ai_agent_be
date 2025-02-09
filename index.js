@@ -110,8 +110,8 @@ console.log('Extracted Lines:', lines);
 
 
 // Twilio credentials (replace with your own credentials)
-const accountSid = 'AC5eea7b020cce1f7bad28a590607a95b7';
-const authToken = 'b6b3688c57e13bdd2ec20426385835eb';
+const accountSid = 'ACb3b87fd4169e35094037fccf55ba64b9';
+const authToken = '6b4d27da7c747cb88fb442d88a3d024f';
 const newclient = new Twilio(accountSid, authToken);
 
 // In-memory user state
