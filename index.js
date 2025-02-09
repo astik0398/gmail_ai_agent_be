@@ -4,7 +4,16 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const OpenAI = require("openai");
 require("dotenv").config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const { MessagingResponse } = require('twilio').twiml;
+const { Twilio } = require('twilio');
 
+// const app = express();
+// const port = 5000;
+
+// Set up middleware to parse incoming request data
+app.use(bodyParser.urlencoded({ extended: false }));
 const app = express();
 const port = 5000;
 
@@ -98,6 +107,62 @@ console.log('Extracted Lines:', lines);
         res.status(500).json({ error: 'Failed to send email' });
     }
 });
+
+
+
+// Twilio credentials (replace with your own credentials)
+const accountSid = 'AC5eea7b020cce1f7bad28a590607a95b7';
+const authToken = 'b6b3688c57e13bdd2ec20426385835eb';
+const newclient = new Twilio(accountSid, authToken);
+
+// In-memory user state
+const userState = {};
+
+// POST route for handling messages from Twilio
+app.post('/wbot', (req, res) => {
+  const inmsg = (req.body.Body || '').trim().toLowerCase();
+  const senderNumber = req.body.From;
+
+  const response = new MessagingResponse();
+  const msg = response.message();
+
+  if (userState[senderNumber] === 'awaiting_date') {
+    msg.body(`Booking confirmed for ${inmsg}.`);
+    delete userState[senderNumber];
+  } else if (inmsg.includes('hello')) {
+    msg.body("Hello, Welcome to SwasthyaConnect. I am here to help connect you with a doctor for your health concerns.");
+    msg.body("Please tell me your symptoms or the issues you are facing today.");
+  } else if (inmsg.includes('headache') && inmsg.length === 8) {
+    msg.body("Thank you for reaching out, I am here to assist you.");
+    msg.body("You mentioned you have a headache.");
+    msg.body("How long have you been experiencing the headache?");
+    msg.body("Is it mild, moderate or severe?");
+    msg.body("Do you have any other symptoms, like nausea or dizziness or fever?");
+    msg.body("This will help us find the right doctor for you.");
+  } else if (inmsg.includes('mild')) {
+    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Monday, Wednesday, Friday from 12-3pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+  } else if (inmsg.includes('moderate')) {
+    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Tuesday and Wednesday from 11-2pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+  } else if (inmsg.includes('severe')) {
+    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Monday, Thursday, Saturday from 3-5pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+  } else if (inmsg.includes('appointment')) {
+    msg.body("Mention the date you are looking for an appointment.");
+    userState[senderNumber] = 'awaiting_date';
+  } else if (inmsg.includes('bye')) {
+    msg.body("Thanks for connecting, I will book that time for you.");
+  } else {
+    msg.body("I am sorry, I don't understand.");
+  }
+
+  res.set('Content-Type', 'text/xml');
+  res.send(response.toString());
+});
+
+// Start the server
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
+// });
+
 
 
 app.listen(port, () => {
