@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const OpenAI = require("openai");
 require("dotenv").config();
-const express = require('express');
+
 const bodyParser = require('body-parser');
 const { MessagingResponse } = require('twilio').twiml;
 const { Twilio } = require('twilio');
