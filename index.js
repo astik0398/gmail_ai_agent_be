@@ -128,26 +128,33 @@ app.post('/wbot', (req, res) => {
   if (userState[senderNumber] === 'awaiting_date') {
     msg.body(`Booking confirmed for ${inmsg}.`);
     delete userState[senderNumber];
-  } else if (inmsg.includes('hello')) {
+  } else if (inmsg === 'hello') {
     msg.body("Hello, Welcome to SwasthyaConnect. I am here to help connect you with a doctor for your health concerns.");
     msg.body("Please tell me your symptoms or the issues you are facing today.");
-  } else if (inmsg.includes('headache') && inmsg.length === 8) {
+  } else if (inmsg === 'headache') {
     msg.body("Thank you for reaching out, I am here to assist you.");
     msg.body("You mentioned you have a headache.");
     msg.body("How long have you been experiencing the headache?");
     msg.body("Is it mild, moderate or severe?");
     msg.body("Do you have any other symptoms, like nausea or dizziness or fever?");
     msg.body("This will help us find the right doctor for you.");
-  } else if (inmsg.includes('mild')) {
-    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Monday, Wednesday, Friday from 12-3pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
-  } else if (inmsg.includes('moderate')) {
-    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Tuesday and Wednesday from 11-2pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
-  } else if (inmsg.includes('severe')) {
-    msg.body("You can contact Dr. R.G. Sharma for an appointment. He is free on Monday, Thursday, Saturday from 3-5pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
-  } else if (inmsg.includes('appointment')) {
-    msg.body("Mention the date you are looking for an appointment.");
-    userState[senderNumber] = 'awaiting_date';
-  } else if (inmsg.includes('bye')) {
+  } else if (inmsg === 'mild' || inmsg === 'moderate' || inmsg === 'severe') {
+    // First response when user sends mild, moderate, or severe
+    msg.body("You can contact Dr. R.G. Sharma for an appointment.");
+
+    // Depending on the severity, send the available time slots when the user asks for "appointment"
+    userState[senderNumber] = inmsg; // Store the severity (mild, moderate, severe)
+  } else if (inmsg === 'appointment') {
+    // Check the stored severity and send the appropriate available times
+    if (userState[senderNumber] === 'mild') {
+      msg.body("He is free on Monday, Wednesday, Friday from 12-3pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+    } else if (userState[senderNumber] === 'moderate') {
+      msg.body("He is free on Tuesday and Wednesday from 11-2pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+    } else if (userState[senderNumber] === 'severe') {
+      msg.body("He is free on Monday, Thursday, Saturday from 3-5pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
+    }
+    userState[senderNumber] = 'awaiting_date'; // Now expecting the day from the user
+  } else if (inmsg === 'bye') {
     msg.body("Thanks for connecting, I will book that time for you.");
   } else {
     msg.body("I am sorry, I don't understand.");
@@ -156,6 +163,7 @@ app.post('/wbot', (req, res) => {
   res.set('Content-Type', 'text/xml');
   res.send(response.toString());
 });
+
 
 // Start the server
 // app.listen(port, () => {
