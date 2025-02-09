@@ -7,14 +7,14 @@ require("dotenv").config();
 
 const { MessagingResponse } = require('twilio').twiml;
 const { Twilio } = require('twilio');
-
+const app = express();
+const port = 5000;
 // const app = express();
 // const port = 5000;
 
 // Set up middleware to parse incoming request data
 app.use(bodyParser.urlencoded({ extended: false }));
-const app = express();
-const port = 5000;
+
 
 app.use(bodyParser.json());
 app.use(cors());
