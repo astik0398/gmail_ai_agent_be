@@ -108,16 +108,12 @@ console.log('Extracted Lines:', lines);
 });
 
 
-
-// Twilio credentials (replace with your own credentials)
-const accountSid = 'AC1dec682dc42c2bc43e92e0bfe0e1b07a';
-const authToken = 'd2c1d0476c7480d8d8f17bd3ac82c152';
+const accountSid = 'AC91853af086d6fab38c6e8d539d5f36a9';
+const authToken = '518f491f72247ec9642a942c89d6d226';
 const newclient = new Twilio(accountSid, authToken);
 
-// In-memory user state
 const userState = {};
 
-// POST route for handling messages from Twilio
 app.post('/wbot', (req, res) => {
   const inmsg = (req.body.Body || '').trim().toLowerCase();
   const senderNumber = req.body.From;
@@ -139,13 +135,12 @@ app.post('/wbot', (req, res) => {
     msg.body("Do you have any other symptoms, like nausea or dizziness or fever?");
     msg.body("This will help us find the right doctor for you.");
   } else if (inmsg === 'mild' || inmsg === 'moderate' || inmsg === 'severe') {
-    // First response when user sends mild, moderate, or severe
+
     msg.body("You can contact Dr. R.G. Sharma for an appointment.");
 
-    // Depending on the severity, send the available time slots when the user asks for "appointment"
-    userState[senderNumber] = inmsg; // Store the severity (mild, moderate, severe)
+    
+    userState[senderNumber] = inmsg; 
   } else if (inmsg === 'appointment') {
-    // Check the stored severity and send the appropriate available times
     if (userState[senderNumber] === 'mild') {
       msg.body("He is free on Monday, Wednesday, Friday from 12-3pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
     } else if (userState[senderNumber] === 'moderate') {
@@ -153,7 +148,7 @@ app.post('/wbot', (req, res) => {
     } else if (userState[senderNumber] === 'severe') {
       msg.body("He is free on Monday, Thursday, Saturday from 3-5pm. Let us know which time is most suitable for you, and I will book an appointment with him accordingly.");
     }
-    userState[senderNumber] = 'awaiting_date'; // Now expecting the day from the user
+    userState[senderNumber] = 'awaiting_date'; 
   } else if (inmsg === 'bye') {
     msg.body("Thanks for connecting, I will book that time for you.");
   } else {
